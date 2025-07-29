@@ -184,12 +184,4 @@ python tests/test_pipeline.py
 The script will print a detailed summary of passed and failed unit and integration tests.
 
 ## Sample Outputs
-
-### UMAP Visualization
-![UMAP Example](docs/images/marker_expression_comparison.png)
-
-### Multi-Sample Comparison
-![Comparison Plots](docs/images/marker_expression_comparison.png)
-
-### Pipeline Architecture
-[View Architecture Tree](docs/images/project_tree.txt)
+docs/images
