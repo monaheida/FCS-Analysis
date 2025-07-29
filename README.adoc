@@ -1,0 +1,195 @@
+# FCS Analysis Pipeline
+
+This repository contains a robust & reproducible Snakemake workflow for analyzing Flow Cytometry Standard (FCS) files.
+The pipeline processes raw FCS data, performs key transformations & unsupervised learning steps, generates
+informative outputs & visualizations.
+
+## Features
+
+Automated FCS Processing: A Snakemake-driven pipeline that handles multiple FCS files efficiently.
+
+Channel Selection: Allows input of channels.txt to precisely control which channels are used for analysis.
+
+Data Transformation: Applies asinh transformation with a configurable cofactor for robust data scaling.
+
+Dimensionality Reduction: Computes 2D UMAP embeddings for visualizing high-dimensional data.
+
+Clustering: Performs K-Means clustering (with configurable cluster count) in the transformed data space.
+
+Processed Data Output: Generates new data files containing UMAP coordinates and cluster labels.
+
+Visualization: Produces UMAP plots colored by cluster.
+
+Comparative Analysis: Includes a dedicated script (compare_results.py) to analyze and visualize results
+across multiple processed samples, including cluster distributions and marker expression.
+
+Containerized Environment: Packaged within a Docker container for full reproducibility and easy deployment.
+
+Automated Testing: Comprehensive unit and integration test suite to ensure pipeline reliability and correctness.
+
+Transparent Dependency Management: Dependencies are controlled via environment.yml and Docker.
+
+
+
+## Pipeline Steps (Per Input FCS File)
+
+For each input FCS file, the pipeline performs the following sequence of operations:
+
+### Channel Selection:
+
+. Reads the provided channels.txt file.
+. Selects only those channels explicitly marked with a 1 in the last column of channels.txt. This ensures a
+focused analysis on relevant markers, excluding scatter and other non-analyte channels.
+
+### asinh Transformation:
+
+. Applies an inverse hyperbolic sine (asinh) transformation to the selected channels.
+. A configurable cofactor (default: 5.0) is used to compress high-intensity values and expand
+low-intensity values, which is crucial for handling the wide dynamic range of flow cytometry data.
+
+### UMAP Embedding:
+
+. Computes a 2-dimensional Uniform Manifold Approximation and Projection (UMAP) embedding from the transformed data.
+. UMAP is a non-linear dimensionality reduction technique that effectively preserves both local and global data structures,
+making it ideal for visualizing complex biological populations.
+
+### K-Means Clustering:
+
+. Performs K-Means clustering in the original (transformed) high-dimensional space.
+. The number of clusters (default: 5) is configurable, allowing exploration of different granularity levels in cell population identification.
+
+### Data Augmentation & Output:
+
+. A new data file is generated, which is an extension of the original FCS data. It includes the newly computed 2D UMAP coordinates (UMAP1, UMAP2) and the assigned cluster labels (Cluster_ID).
++
+NOTE: Note on Output Format: The pipeline attempts to write a new .fcs file. However, due to limitations with the fcswrite Python library (which offers basic FCS writing but may not produce files fully compliant with all advanced FCS parsers), a reliable .csv file is always generated as a primary, trustworthy output. This ensures downstream usability regardless of fcswrite's specific FCS header quirks.
+
+### UMAP Plot Generation:
+
+. A UMAP scatter plot is generated, with each data point colored according to its assigned cluster. This visualization aids in interpreting the clustering results and understanding the distribution of cell populations.
+
+
+## Requirements & Installation
+
+The pipeline can be set up using either Conda/Micromamba for local development or Docker for containerized deployment.
+
+### Option 1: Using Conda (recommended for local development)
+
+. Install Conda: Follow the official installation guides for your OS. 
+. Create and Activate Environment:
+[source,bash]
+conda env create -f environment.yml
+conda activate fcs-pipeline
+
+[source,bash]
+python scripts/fcs_analysis.py \
+    -i data/raw/FR-FCM-Z3HK_TcellPanel_kidney_IPIKID-073_Viable.fcs \
+    -o data/processed/FR-FCM-Z3HK_TcellPanel_kidney_IPIKID-073_Viable_processed.fcs \
+    -p plots/FR-FCM-Z3HK_TcellPanel_kidney_IPIKID-073_Viable_umap.png \
+    -c channels.txt
+
+### Option 2: Using Docker (recommended for deployment & reproducibility)
+
+. Install Docker: Download and install Docker Desktop for your operating system. 
+. Build the Docker Image:
+[source,bash]
+docker build -t fcs-pipeline .
+
+This command will build a Docker image named fcs-pipeline containing all necessary dependencies and the pipeline code.
+
+## Running the Pipeline
+
+. Place your FCS files: Put your raw FCS files into the data/raw/ dir.
+
+### Using Conda (from the project root dir):
+
+[source,bash]
+conda activate fcs-pipeline
+snakemake --cores 4
+
+### Using Docker:
+
+[source,bash]
+docker run --rm -v "$(pwd):/pipeline" -w /pipeline fcs_pipeline snakemake --cores 4 --forceall
+
+--rm: Removes the container after it exits.
+
+-v "$(pwd):/pipeline": Mounts your current host dir (where your data, config.yaml, Snakefile etc. are)
+to the /pipeline dir inside the Docker container. This is crucial for input/output.
+
+-w /pipeline: Sets the working dir inside the container to /pipeline.
+
+fcs-pipeline: The name of your built Docker image.
+
+snakemake --cores 4: The command to execute Snakemake within the container, using 4 CPU cores for parallelization.
+
+### Outputs:
+
+Processed data (CSV files) will be written to data/processed/.
+
+Individual UMAP plots (_umap.png) will be written to plots/.
+
+Execution logs will be found in logs/.
+
+(An .fcs file will also be attempted in data/processed/, but its interoperability may be limited, as discussed below).
+
+## Analyzing Results
+
+After the pipeline runs, you can use the compare_results.py script to generate comparative visualizations and a summary table.
+
+### Run the analysis script:
+
+### Using Docker:
+
+[source,bash]
+docker run -it \
+  -v $(pwd)/results:/pipeline/results \
+  -v $(pwd)/plots:/pipeline/plots \
+  -v $(pwd)/data:/pipeline/data \
+  fcs-pipeline bash
+python scripts/compare_results.py \
+
+### Outputs:
+
+plots/results_comparison.png: Main comparison plot (cluster distributions, total cells).
+
+plots/umap_comparison_individual.png: Separate UMAP plots for each sample (up to 4 per figure).
+
+plots/marker_expression_comparison.png: Box plots comparing expression of key markers across samples.
+
+results/analysis_summary.csv: A CSV file summarizing cell counts, cluster numbers, and UMAP ranges for each sample.
+
+## Testing
+
+A comprehensive test suite is included to ensure the pipeline's reliability and correctness.
+
+### Run the tests:
+
+### Using Conda (from the project root dir):
+
+[source,bash]
+conda activate fcs_pipeline python tests/test_pipeline.py
+
+### Using Docker:
+
+[source,bash]
+docker run -it \  -v $(pwd)/results:/pipeline/results \
+  -v $(pwd)/plots:/pipeline/plots \
+  -v $(pwd)/data:/pipeline/data \
+  fcs-pipeline bash
+python tests/test_pipeline.py
+
+### Test Output:
+
+The script will print a detailed summary of passed and failed unit and integration tests.
+
+## Sample Outputs
+
+### UMAP Visualization
+![UMAP Example](docs/images/marker_expression_comparison.png)
+
+### Multi-Sample Comparison
+![Comparison Plots](docs/images/marker_expression_comparison.png)
+
+### Pipeline Architecture
+[View Architecture Tree](docs/images/project_tree.txt)

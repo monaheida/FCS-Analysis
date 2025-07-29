@@ -1,15 +1,39 @@
-import os, glob
-RAW_DIR = config.get('raw_dir', 'data/raw')
-PROCESSED_DIR = config.get('processed_dir', 'data/processed')
-PLOT_DIR = config.get('plot_dir', 'plots')
+import os
+import glob
 
-samples = [os.path.splitext(os.path.basename(f))[0] for f in glob.glob(os.path.join(RAW_DIR, '*.fcs'))]
+configfile: "config.yaml"
+
+FCS_FILES = glob.glob("data/raw/*.fcs")
+if not FCS_FILES:
+    raise Exception("No FCS files found in data/raw/")
+
+SAMPLES = [os.path.basename(f).replace('.fcs', '') for f in FCS_FILES]
+
+rule all:
+    input:
+        expand("data/processed/{sample}_processed.fcs", sample=SAMPLES),
+        expand("plots/{sample}_umap.png", sample=SAMPLES)
 
 rule process_fcs:
     input:
-        os.path.join(RAW_DIR, '{sample}.fcs')
+        fcs="data/raw/{sample}.fcs"
     output:
-        fcs=os.path.join(PROCESSED_DIR, '{sample}_umap_clust.fcs'),
-        plot=os.path.join(PLOT_DIR, '{sample}.png')
+        processed_fcs="data/processed/{sample}_processed.fcs",
+        plot="plots/{sample}_umap.png"
+    params:
+        channels_arg="-c channels.txt" if os.path.exists("channels.txt") else "",
+        asinh_cofactor=config.get("asinh_cofactor", 5.0),
+        num_clusters=config.get("num_clusters", 5)
+    log:
+        "logs/process_{sample}.log"
     shell:
-        'Rscript {workflow.basedir}/scripts/process_fcs.R -i {input} -o {output.fcs} -p {output.plot}'
+        """
+        python scripts/fcs_analysis.py \
+            -i {input.fcs} \
+            -o {output.processed_fcs} \
+            -p {output.plot} \
+            {params.channels_arg} \
+            --asinh_cofactor {params.asinh_cofactor} \
+            --num_clusters {params.num_clusters} \
+            2>&1 | tee {log}
+        """

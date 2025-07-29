@@ -1,0 +1,21 @@
+
+asinh_cofactor: 5.0
+num_clusters: 5
+
+raw_data_dir: "data/raw"
+processed_data_dir: "data/processed"
+plots_dir: "plots"
+results_dir: "results"
+logs_dir: "logs"
+
+channels_file: "channels.txt"
+
+umap_n_components: 2
+umap_random_state: 42
+
+kmeans_random_state: 42
+kmeans_n_init: 10
+
+plot_dpi: 300
+plot_figsize_width: 10
+plot_figsize_height: 8

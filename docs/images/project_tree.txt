@@ -1,0 +1,29 @@
+.
+├── -
+├── config.yaml
+├── data
+│   ├── processed
+│   │   ├── FR-FCM-Z3HK_TcellPanel_kidney_IPIKID-073_Viable_processed.csv
+│   │   ├── FR-FCM-Z3HK_TcellPanel_kidney_IPIKID-076_Viable_processed.csv
+│   │   ├── FR-FCM-Z3HK_TcellPanel_sarcoma_IPISRC-013_N1_Viable_processed.csv
+│   │   └── FR-FCM-Z3HK_TcellPanel_sarcoma_IPISRC-09_Viable_processed.csv
+│   └── raw
+├── Dockerfile
+├── environment.yml
+├── plots
+├── README.adoc
+├── results
+│   ├── analysis_summary.csv
+│   ├── FR-FCM-Z3HK_TcellPanel_kidney_IPIKID-073_Viable_processed.csv
+│   ├── FR-FCM-Z3HK_TcellPanel_kidney_IPIKID-073_Viable_processed.csv.csv
+│   ├── FR-FCM-Z3HK_TcellPanel_kidney_IPIKID-076_Viable_processed.csv
+│   ├── FR-FCM-Z3HK_TcellPanel_sarcoma_IPISRC-013_N1_Viable_processed.csv
+│   └── FR-FCM-Z3HK_TcellPanel_sarcoma_IPISRC-09_Viable_processed.csv
+├── scripts
+│   ├── compare_results.py
+│   └── fcs_analysis.py
+├── Snakefile
+└── tests
+    └── test_pipeline.py
+
+8 directories, 19 files

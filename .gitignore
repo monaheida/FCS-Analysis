@@ -1,0 +1,43 @@
+# Generated output files
+data/processed/
+plots/
+results/
+logs/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+scripts/__pycache__/
+
+.snakemake/
+
+# Temporary files that appear in tree
+IPISRC-09
+sarcoma
+TcellPanel
+Viable.log
+-
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+.dockerignore
+
+.env
+
+# Large data files
+# data/raw/*.fcs

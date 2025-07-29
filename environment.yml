@@ -2,12 +2,19 @@ name: fcs_pipeline
 channels:
   - conda-forge
   - bioconda
-  - defaults
 dependencies:
   - python=3.11
-  - snakemake
-  - r-base=4.3
-  - r-flowcore
-  - r-ggplot2
-  - r-uwot
-  - r-optparse
+  - pandas>=1.5.0
+  - numpy>=1.21.0
+  - matplotlib>=3.5.0
+  - seaborn>=0.11.0
+  - scikit-learn>=1.1.0
+  - umap-learn>=0.5.3
+  - snakemake>=7.0.0
+  - pyyaml>=6.0
+  - pip
+  - pip:
+    - fcsparser>=0.2.4
+    - flowkit>=0.9.0
+    - flowio>=0.9.4
+    - fcswrite>=0.6.0
