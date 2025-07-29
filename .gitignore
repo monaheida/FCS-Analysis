@@ -35,6 +35,9 @@ Thumbs.db
 .vscode/
 .idea/
 
+# Miniconda installer
+Miniconda3-latest-MacOSX-arm64.sh
+
 .dockerignore
 
 .env
