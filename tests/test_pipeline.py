@@ -12,7 +12,6 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 class UnitTests:
     @staticmethod
     def test_data_processing_functions():
-        """Test individual data processing functions"""
         print("Unit Tests: Data Processing Functions")
         print("-" * 40)
         
@@ -49,7 +48,6 @@ class UnitTests:
     
     @staticmethod
     def test_config_parsing():
-        """Test configuration file parsing"""
         print("\nUnit Tests: Config Parsing")
         print("-" * 40)
         
@@ -94,7 +92,6 @@ class UnitTests:
     
     @staticmethod
     def test_file_io_functions():
-        """Test file input/output functions"""
         print("\nUnit Tests: File I/O")
         print("-" * 40)
         
@@ -102,7 +99,7 @@ class UnitTests:
             temp_dir = tempfile.mkdtemp()
             test_csv = Path(temp_dir) / 'test.csv'
             
-            # Create test data
+            # Create test data 
             test_df = pd.DataFrame({
                 'A': [1, 2, 3],
                 'B': [4, 5, 6]
@@ -162,7 +159,7 @@ class IntegrationTests:
         ]
         
         print(f"Running Snakemake command: {' '.join(cmd)}")
-        result = subprocess.run(cmd, cwd=PROJECT_ROOT, capture_output=True, text=True, timeout=180) # <--- Correctly uses PROJECT_ROOT for cwd
+        result = subprocess.run(cmd, cwd=PROJECT_ROOT, capture_output=True, text=True, timeout=180)
 
         if result.stdout:
             print(f"Snakemake STDOUT:\n{result.stdout[-500:]}")
@@ -257,7 +254,6 @@ class IntegrationTests:
     
     @staticmethod
     def test_environment_integration():
-        """Test integration between Docker environment and tools"""
         print("\nIntegration Test: Environment")
         print("-" * 40)
         
